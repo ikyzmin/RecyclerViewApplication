@@ -1,4 +1,4 @@
-package com.jaka.recyclerviewapplication.view;
+package com.jaka.recyclerviewapplication.view.adapter.contact;
 
 import android.view.LayoutInflater;
 import android.view.View;

@@ -2,8 +2,9 @@ package com.jaka.recyclerviewapplication;
 
 import android.os.Bundle;
 
+import com.jaka.recyclerviewapplication.domain.ContactInteractor;
 import com.jaka.recyclerviewapplication.model.Contact;
-import com.jaka.recyclerviewapplication.view.ContactsAdapter;
+import com.jaka.recyclerviewapplication.view.adapter.contact.ContactsAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public class RecyclerViewActivity extends AppCompatActivity {
 
     private final List<Contact> contactList = new ArrayList<>();
+    private static final ContactInteractor contactInteractor = new ContactInteractor();
 
     public RecyclerViewActivity() {
     }
@@ -39,12 +41,13 @@ public class RecyclerViewActivity extends AppCompatActivity {
         contactList.add(new Contact("+7634631362", "Brad", "Pitt"));
         contactList.add(new Contact("+7541525125", "Alexander", "Kuticyn"));
         contactList.add(new Contact("+7564634643", "Mark", "Twen"));
+        contactInteractor.saveContacts(contactList);
     }
 
     private void initRecyclerView() {
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         ContactsAdapter contactsAdapter = new ContactsAdapter();
-        contactsAdapter.setContacts(contactList);
+        contactsAdapter.setContacts(contactInteractor.getAllContacts());
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 layoutManager.getOrientation());
