@@ -17,6 +17,12 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactViewHolder> {
 
     private final List<Contact> contacts = new ArrayList<>();
 
+    private View.OnClickListener clickListener;
+
+    public ContactsAdapter(View.OnClickListener clickListener){
+        this.clickListener = clickListener;
+    }
+
     @NonNull
     @Override
     public ContactViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -26,7 +32,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ContactViewHolder holder, int position) {
-        holder.bind(contacts.get(position));
+        holder.bind(contacts.get(position),clickListener);
     }
 
     @Override

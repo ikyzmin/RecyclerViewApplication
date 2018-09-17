@@ -22,10 +22,11 @@ public class ContactViewHolder extends RecyclerView.ViewHolder {
         phoneNumberTextView = itemView.findViewById(R.id.phone_number_text_view);
     }
 
-    public void bind(Contact contact) {
+    public void bind(Contact contact, View.OnClickListener listener) {
         firstNameTextView.setText(contact.getFirstName());
         lastNameTextView.setText(contact.getLastName());
         phoneNumberTextView.setText(contact.getPhoneNumber());
+        itemView.setOnClickListener(listener);
     }
 
 }

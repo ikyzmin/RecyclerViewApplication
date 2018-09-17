@@ -1,9 +1,11 @@
 package com.jaka.recyclerviewapplication;
 
 import android.os.Bundle;
+import android.view.View;
 
 import com.jaka.recyclerviewapplication.domain.ContactInteractor;
 import com.jaka.recyclerviewapplication.model.Contact;
+import com.jaka.recyclerviewapplication.view.LoadingFragment;
 import com.jaka.recyclerviewapplication.view.adapter.contact.ContactsAdapter;
 
 import java.util.ArrayList;
@@ -46,7 +48,16 @@ public class RecyclerViewActivity extends AppCompatActivity {
 
     private void initRecyclerView() {
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
-        ContactsAdapter contactsAdapter = new ContactsAdapter();
+        ContactsAdapter contactsAdapter = new ContactsAdapter(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .add(R.id.container, new LoadingFragment(), LoadingFragment.class.getSimpleName())
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
         contactsAdapter.setContacts(contactInteractor.getAllContacts());
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
