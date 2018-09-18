@@ -19,5 +19,7 @@
         <provider
             android:name=".data.repositories.ContactContentProvider"
             android:authorities="com.jaka.recyclerviewapplication" />
+
+        <service android:name=".async.asyncservice.LoaderService"/>
     </application>
 </manifest>
