@@ -6,6 +6,7 @@ import android.view.View;
 import com.jaka.recyclerviewapplication.domain.ContactInteractor;
 import com.jaka.recyclerviewapplication.model.Contact;
 import com.jaka.recyclerviewapplication.view.LoadingFragment;
+import com.jaka.recyclerviewapplication.view.ScheduleFragment;
 import com.jaka.recyclerviewapplication.view.adapter.contact.ContactsAdapter;
 
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public class RecyclerViewActivity extends AppCompatActivity {
             public void onClick(View v) {
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .add(R.id.container, new LoadingFragment(), LoadingFragment.class.getSimpleName())
+                        .add(R.id.container, new ScheduleFragment(), ScheduleFragment.class.getSimpleName())
                         .addToBackStack(null)
                         .commit();
             }

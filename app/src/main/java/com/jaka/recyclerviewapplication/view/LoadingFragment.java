@@ -1,6 +1,9 @@
 package com.jaka.recyclerviewapplication.view;
 
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -8,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +24,7 @@ import com.jaka.recyclerviewapplication.async.Loader;
 import com.jaka.recyclerviewapplication.async.LoaderThread;
 import com.jaka.recyclerviewapplication.async.asyncservice.LoaderService;
 import com.jaka.recyclerviewapplication.async.asynctask.LoaderAsyncTask;
+import com.jaka.recyclerviewapplication.jobs.services.JobSchedulerService;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,6 +37,7 @@ public class LoadingFragment extends Fragment {
     private Button loadButton;
     private Button loadButtonAsyncTask;
     private Button loadButtonIntentService;
+    private Button loadButtonWithJob;
     private LoaderThread loaderThread;
     private TextView loadingProgressTextView;
 
@@ -103,6 +109,23 @@ public class LoadingFragment extends Fragment {
         loadingProgressTextView = view.findViewById(R.id.loading_progress);
         loadButtonAsyncTask = view.findViewById(R.id.load_button_async_task);
         loadButtonIntentService = view.findViewById(R.id.load_button_intent_service);
+        loadButtonWithJob = view.findViewById(R.id.load_button_job_scheduler);
+        loadButtonWithJob.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ComponentName serviceName = new ComponentName(v.getContext(), JobSchedulerService.class);
+                JobInfo jobInfo = new JobInfo.Builder(1, serviceName)
+                        .setPeriodic(5*1000*60)
+                        .build();
+                JobScheduler scheduler = (JobScheduler) v.getContext().getSystemService(Context.JOB_SCHEDULER_SERVICE);
+                if (scheduler!=null) {
+                    int result = scheduler.schedule(jobInfo);
+                    if (result == JobScheduler.RESULT_SUCCESS) {
+                        Log.d("TEST", "Job scheduled successfully!");
+                    }
+                }
+            }
+        });
         loadButtonIntentService.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
