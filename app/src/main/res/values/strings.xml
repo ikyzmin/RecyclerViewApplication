@@ -10,4 +10,6 @@
 
     <string name="start_date">Start date</string>
     <string name="end_date">End date</string>
+
+    <string name="description">Description</string>
 </resources>
