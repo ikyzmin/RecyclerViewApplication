@@ -21,7 +21,7 @@ import android.widget.TextView;
 
 import com.jaka.recyclerviewapplication.R;
 import com.jaka.recyclerviewapplication.async.Loader;
-import com.jaka.recyclerviewapplication.async.LoaderThread;
+import com.jaka.recyclerviewapplication.async.DatabaseThread;
 import com.jaka.recyclerviewapplication.async.asyncservice.LoaderService;
 import com.jaka.recyclerviewapplication.async.asynctask.LoaderAsyncTask;
 import com.jaka.recyclerviewapplication.jobs.services.JobSchedulerService;
@@ -38,7 +38,7 @@ public class LoadingFragment extends Fragment {
     private Button loadButtonAsyncTask;
     private Button loadButtonIntentService;
     private Button loadButtonWithJob;
-    private LoaderThread loaderThread;
+    private DatabaseThread loaderThread;
     private TextView loadingProgressTextView;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -173,14 +173,12 @@ public class LoadingFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        loaderThread = new LoaderThread();
+        loaderThread = new DatabaseThread();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        loaderThread.start();
-        loaderThread.initHandler(callbackHandler);
         IntentFilter intentFilter = new IntentFilter(LoaderService.LOADING_START);
         intentFilter.addAction(LoaderService.LOADING_PROGRESS);
         intentFilter.addAction(LoaderService.LOADING_END);
@@ -190,7 +188,6 @@ public class LoadingFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        loaderThread.quit();
         LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(broadcastReceiver);
     }
 }

@@ -4,17 +4,27 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
+import com.jaka.recyclerviewapplication.model.Contact;
+import com.jaka.recyclerviewapplication.model.ContactDao;
+
+import java.util.List;
+
 public class Loader extends Handler {
 
     public static final int LOADING_PROCESS = 0;
     public static final int LOADING_START = 1;
     public static final int LOADING_COMPLETE = 2;
 
-    Handler callbackHandler;
+    public static final int GET_ALL_CONTACTS = 3;
+    public static final int INSERT_CONTACT = 4;
 
-    public Loader(Looper looper, Handler callbackHandler) {
+    Handler callbackHandler;
+    private ContactDao contactDao;
+
+    public Loader(Looper looper, ContactDao contactDao, Handler callbackHandler) {
         super(looper);
         this.callbackHandler = callbackHandler;
+        this.contactDao = contactDao;
     }
 
     public Loader(Looper looper, Callback callback) {
@@ -35,6 +45,14 @@ public class Loader extends Handler {
                         e.printStackTrace();
                     }
                 }
+                callbackHandler.obtainMessage(LOADING_COMPLETE).sendToTarget();
+                break;
+            case GET_ALL_CONTACTS:
+                List<Contact> contactList = contactDao.getContacts();
+                callbackHandler.obtainMessage(LOADING_COMPLETE, contactList).sendToTarget();
+                break;
+            case INSERT_CONTACT:
+                contactDao.insertAll((Contact) msg.obj);
                 callbackHandler.obtainMessage(LOADING_COMPLETE).sendToTarget();
                 break;
         }

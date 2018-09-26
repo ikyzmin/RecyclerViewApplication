@@ -20,7 +20,7 @@ public class JobSchedulerService extends JobService {
                         "Time is now", params.getExtras().getString(ScheduleFragment.DESCRIPTION_EXTRA));
                 break;
             case 2:
-                ScheduleNotificationManager.showNotification(getApplicationContext(), 1, "End Your Work",
+                ScheduleNotificationManager.showNotification(getApplicationContext(), 1,   "End Your Work",
                         "Time to relax ", params.getExtras().getString(ScheduleFragment.DESCRIPTION_EXTRA));
                 break;
         }

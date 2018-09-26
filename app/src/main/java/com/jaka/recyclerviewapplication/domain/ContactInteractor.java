@@ -41,7 +41,7 @@ public class ContactInteractor {
         Cursor cursor = contentResolver.query(uri, null, null, null, null);
         cursor.moveToFirst();
         while (cursor.moveToNext()) {
-            contacts.add(new Contact(cursor.getString(3), cursor.getString(1), cursor.getString(2)));
+            contacts.add(new Contact.Builder().firstName(cursor.getString(3)).lastName(cursor.getString(1)).phoneNumber(cursor.getString(2)).build());
         }
         cursor.close();
         return contacts;
