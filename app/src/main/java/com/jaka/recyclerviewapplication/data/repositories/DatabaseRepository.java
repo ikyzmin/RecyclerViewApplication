@@ -11,20 +11,19 @@ import java.util.List;
 
 public class DatabaseRepository {
 
-    private DatabaseThread databaseThread = new DatabaseThread();
-    private Handler callback;
+    private DatabaseThread databaseThread;
     private ContactDatabase contactDatabase;
 
-    public DatabaseRepository(ContactDatabase database, Handler callbackHandler) {
-        this.callback = callbackHandler;
+    public DatabaseRepository(ContactDatabase database) {
         this.contactDatabase = database;
+        databaseThread = new DatabaseThread();
     }
 
     public void quit() {
         databaseThread.quit();
     }
 
-    public void start() {
+    public void start(Handler callback) {
         databaseThread.start();
         databaseThread.initHandler(callback, contactDatabase.contactDao());
     }

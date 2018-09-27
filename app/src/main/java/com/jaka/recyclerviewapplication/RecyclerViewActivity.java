@@ -28,18 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public class RecyclerViewActivity extends AppCompatActivity {
 
     private final List<Contact> contactList = new ArrayList<>();
-    private final DatabaseRepository databaseRepository = new DatabaseRepository(App.getInstance().getDatabase(), new Handler(Looper.getMainLooper()) {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case Loader.LOADING_COMPLETE:
-                    if (msg.obj != null) {
-                        contactsAdapter.setContacts((List<Contact>) msg.obj);
-                    }
-                    break;
-            }
-        }
-    });
+    private DatabaseRepository databaseRepository;
 
     private static final ContactInteractor contactInteractor = new ContactInteractor();
     ContactsAdapter contactsAdapter = new ContactsAdapter(new View.OnClickListener() {
@@ -89,7 +78,19 @@ public class RecyclerViewActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        databaseRepository.start();
+        databaseRepository = new DatabaseRepository(App.getInstance().getDatabase());
+        databaseRepository.start(new Handler(getMainLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case Loader.LOADING_COMPLETE:
+                        if (msg.obj != null) {
+                            contactsAdapter.setContacts((List<Contact>) msg.obj);
+                        }
+                        break;
+                }
+            }
+        });
         databaseRepository.getAllContacts();
     }
 

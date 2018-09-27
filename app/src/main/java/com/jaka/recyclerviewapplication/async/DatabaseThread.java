@@ -11,13 +11,17 @@ public class DatabaseThread extends HandlerThread {
 
     private static final String LOADER = "Loader";
 
-    Loader loader;
+    private Loader loader;
 
     public DatabaseThread() {
         super(LOADER);
     }
 
     public void initHandler(Handler callbackHandler, ContactDao contactDao) {
+        if (loader != null) {
+            loader.removeMessages(Loader.GET_ALL_CONTACTS);
+            loader.removeMessages(Loader.INSERT_CONTACT);
+        }
         loader = new Loader(getLooper(), contactDao, callbackHandler);
     }
 
@@ -30,7 +34,7 @@ public class DatabaseThread extends HandlerThread {
     }
 
     public void insertContact(Contact contact) {
-        loader.obtainMessage(Loader.INSERT_CONTACT,contact).sendToTarget();
+        loader.obtainMessage(Loader.INSERT_CONTACT, contact).sendToTarget();
     }
 
 }

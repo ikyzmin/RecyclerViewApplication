@@ -29,23 +29,24 @@ public class AddContactActivity extends AppCompatActivity {
     private EditText lastNameEditText;
     private EditText phoneNumberEditText;
 
-    private final DatabaseRepository databaseRepository = new DatabaseRepository(App.getInstance().getDatabase(), new Handler(Looper.getMainLooper()) {
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case Loader.LOADING_COMPLETE:
-                    finish();
-                    break;
-            }
-        }
-    });
+    private DatabaseRepository databaseRepository;
 
     private Button okButton;
 
     @Override
     protected void onResume() {
         super.onResume();
-        databaseRepository.start();
+        databaseRepository = new DatabaseRepository(App.getInstance().getDatabase());
+        databaseRepository.start(new Handler(getMainLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case Loader.LOADING_COMPLETE:
+                        finish();
+                        break;
+                }
+            }
+        });
     }
 
     @Override
@@ -62,7 +63,6 @@ public class AddContactActivity extends AppCompatActivity {
         lastNameEditText = findViewById(R.id.last_name_edit_text);
         phoneNumberEditText = findViewById(R.id.phone_number_edit_text);
         okButton = findViewById(R.id.add_button);
-
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

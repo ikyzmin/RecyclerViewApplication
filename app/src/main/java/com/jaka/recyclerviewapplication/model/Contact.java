@@ -1,8 +1,13 @@
 package com.jaka.recyclerviewapplication.model;
 
+import com.jaka.recyclerviewapplication.model.converters.DateTimeConverters;
+
+import java.util.Date;
+
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
 
 @Entity
 public class Contact {
@@ -22,6 +27,10 @@ public class Contact {
     @ColumnInfo(name = "last_name")
     private String lastName;
 
+    @ColumnInfo(name="date")
+    @TypeConverters({DateTimeConverters.class})
+    public Date date = new Date();
+
 
     public String getPhoneNumber() {
         return phoneNumber;
@@ -33,6 +42,14 @@ public class Contact {
 
     public String getLastName() {
         return lastName;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public Date getDate() {
+        return date;
     }
 
     public void setPhoneNumber(String phoneNumber) {
