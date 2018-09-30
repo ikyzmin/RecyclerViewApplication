@@ -1,5 +1,7 @@
 package com.jaka.recyclerviewapplication.model;
 
+import com.google.firebase.firestore.Exclude;
+import com.google.firebase.firestore.IgnoreExtraProperties;
 import com.jaka.recyclerviewapplication.model.converters.DateTimeConverters;
 
 import java.util.Date;
@@ -15,6 +17,9 @@ public class Contact {
     @PrimaryKey(autoGenerate = true)
     private int id;
 
+    @ColumnInfo(name = "remote_id")
+    private String remoteId;
+
 
     @ColumnInfo(name = "phone_number")
     private String phoneNumber;
@@ -27,9 +32,13 @@ public class Contact {
     @ColumnInfo(name = "last_name")
     private String lastName;
 
-    @ColumnInfo(name="date")
+    @ColumnInfo(name = "date")
     @TypeConverters({DateTimeConverters.class})
     public Date date = new Date();
+
+    public Contact() {
+
+    }
 
 
     public String getPhoneNumber() {
@@ -64,12 +73,22 @@ public class Contact {
         this.lastName = lastName;
     }
 
+    @Exclude
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    @Exclude
+    public String getRemoteId() {
+        return remoteId;
+    }
+
+    public void setRemoteId(String remoteId) {
+        this.remoteId = remoteId;
     }
 
     public static class Builder {

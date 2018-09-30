@@ -37,4 +37,12 @@ public class DatabaseRepository {
         databaseThread.insertContact(contact);
     }
 
+    public void insertContacts(Contact ...contact) {
+        databaseThread.insertContact(contact);
+    }
+
+    public void insertContacts(List<Contact> contacts) {
+        databaseThread.insertContact(contacts);
+    }
+
 }

@@ -6,6 +6,8 @@ import android.os.HandlerThread;
 import com.jaka.recyclerviewapplication.model.Contact;
 import com.jaka.recyclerviewapplication.model.ContactDao;
 
+import java.util.List;
+
 
 public class DatabaseThread extends HandlerThread {
 
@@ -35,6 +37,14 @@ public class DatabaseThread extends HandlerThread {
 
     public void insertContact(Contact contact) {
         loader.obtainMessage(Loader.INSERT_CONTACT, contact).sendToTarget();
+    }
+
+    public void insertContact(Contact ...contact) {
+        loader.obtainMessage(Loader.INSERT_CONTACTS, contact).sendToTarget();
+    }
+
+    public void insertContact(List<Contact> contact) {
+        loader.obtainMessage(Loader.INSERT_CONTACTS, contact).sendToTarget();
     }
 
 }

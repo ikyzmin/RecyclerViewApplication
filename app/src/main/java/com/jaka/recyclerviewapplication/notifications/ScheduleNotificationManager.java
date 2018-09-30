@@ -10,7 +10,7 @@ import com.jaka.recyclerviewapplication.R;
 
 import androidx.core.app.NotificationCompat;
 
-public class ScheduleNotificationManager {
+public class    ScheduleNotificationManager {
 
     public static final String CHANNEL_ID = "Test Channel";
 

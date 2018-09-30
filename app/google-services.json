@@ -1,0 +1,45 @@
+{
+  "project_info": {
+    "project_number": "204935034409",
+    "firebase_url": "https://recyclerviewapplication-d6d86.firebaseio.com",
+    "project_id": "recyclerviewapplication-d6d86",
+    "storage_bucket": "recyclerviewapplication-d6d86.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:204935034409:android:facb2a29969495ed",
+        "android_client_info": {
+          "package_name": "com.jaka.recyclerviewapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "204935034409-14kffn2baer0b3rk22tc89ei343r6519.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLGnWKW-MplsGz96BTZTHB9KEdcMI6XNI"
+        },
+        {
+          "current_key": "AIzaSyDLGnWKW-MplsGz96BTZTHB9KEdcMI6XNI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

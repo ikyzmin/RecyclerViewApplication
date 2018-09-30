@@ -17,6 +17,7 @@ public class Loader extends Handler {
 
     public static final int GET_ALL_CONTACTS = 3;
     public static final int INSERT_CONTACT = 4;
+    public static final int INSERT_CONTACTS = 5;
 
     Handler callbackHandler;
     private ContactDao contactDao;
@@ -53,6 +54,14 @@ public class Loader extends Handler {
                 break;
             case INSERT_CONTACT:
                 contactDao.insertAll((Contact) msg.obj);
+                callbackHandler.obtainMessage(LOADING_COMPLETE).sendToTarget();
+                break;
+            case INSERT_CONTACTS:
+                if (msg.obj instanceof Contact[]){
+                    contactDao.insertAll((Contact[]) msg.obj);
+                }else if (msg.obj instanceof List){
+                    contactDao.insertAll((List<Contact>) msg.obj);
+                }
                 callbackHandler.obtainMessage(LOADING_COMPLETE).sendToTarget();
                 break;
         }
