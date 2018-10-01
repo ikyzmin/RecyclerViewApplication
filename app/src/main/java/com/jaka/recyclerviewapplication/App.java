@@ -12,6 +12,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.jaka.recyclerviewapplication.model.ContactDatabase;
 import com.jaka.recyclerviewapplication.model.migrations.ContactMigration2;
 import com.jaka.recyclerviewapplication.model.migrations.ContactMigration3;
+import com.jaka.recyclerviewapplication.model.migrations.ContactMigration4;
 
 import androidx.room.Room;
 
@@ -37,6 +38,7 @@ public class App extends Application {
         contactDatabase = Room.databaseBuilder(this, ContactDatabase.class, "contact")
                 .addMigrations(new ContactMigration2())
                 .addMigrations(new ContactMigration3())
+                .addMigrations(new ContactMigration4())
                 .build();
     }
 

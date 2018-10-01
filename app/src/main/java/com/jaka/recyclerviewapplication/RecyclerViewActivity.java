@@ -40,11 +40,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 public class RecyclerViewActivity extends AppCompatActivity {
 
     private final List<Contact> contactList = new ArrayList<>();
     private DatabaseRepository databaseRepository;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private static final ContactInteractor contactInteractor = new ContactInteractor();
     ContactsAdapter contactsAdapter = new ContactsAdapter(new View.OnClickListener() {
@@ -67,6 +69,13 @@ public class RecyclerViewActivity extends AppCompatActivity {
         setContentView(R.layout.a_recycler);
         mockContacts();
         initRecyclerView();
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh_contacts);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refresh();
+            }
+        });
         FloatingActionButton floatingActionButton = findViewById(R.id.add_contact_floating_button);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,7 +103,10 @@ public class RecyclerViewActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        refresh();
+    }
 
+    private void refresh() {
         databaseRepository = new DatabaseRepository(App.getInstance().getDatabase());
         App.getInstance().getFirebaseCollection().get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
@@ -124,6 +136,7 @@ public class RecyclerViewActivity extends AppCompatActivity {
                             if (msg.obj instanceof List) {
                                 final List<Contact> contacts = (List<Contact>) msg.obj;
                                 contactsAdapter.setContacts(contacts);
+                                swipeRefreshLayout.setRefreshing(false);
                             }
                         }
                         break;

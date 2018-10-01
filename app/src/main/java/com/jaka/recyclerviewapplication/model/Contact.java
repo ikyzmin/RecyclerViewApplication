@@ -8,10 +8,11 @@ import java.util.Date;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
-@Entity
+@Entity(indices = {@Index(value = {"remote_id"}, unique = true)})
 public class Contact {
 
     @PrimaryKey(autoGenerate = true)
