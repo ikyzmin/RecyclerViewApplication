@@ -21,6 +21,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.jaka.recyclerviewapplication.R;
+import com.jaka.recyclerviewapplication.jobs.ScheduleJob;
 import com.jaka.recyclerviewapplication.jobs.services.JobSchedulerService;
 import com.jaka.recyclerviewapplication.view.adapter.contact.ContactsAdapter;
 
@@ -127,43 +128,21 @@ public class ScheduleFragment extends Fragment {
         scheduleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ComponentName serviceName = new ComponentName(v.getContext(), JobSchedulerService.class);
-                JobScheduler jobScheduler = (JobScheduler) v.getContext().getSystemService(Context.JOB_SCHEDULER_SERVICE);
-                if (jobScheduler != null) {
-                    try {
-                        Date start = DATE_WITH_YEAR_FORMAT.parse(startDate.getText().toString());
-                        Date end = DATE_WITH_YEAR_FORMAT.parse(endDate.getText().toString());
-
-                        calendar = Calendar.getInstance();
+                try {
+                    Date start = DATE_WITH_YEAR_FORMAT.parse(startDate.getText().toString());
+                    Date end = DATE_WITH_YEAR_FORMAT.parse(endDate.getText().toString());
 
 
-                        long tillToStart = start.getTime() - calendar.getTimeInMillis();
-                        long tillToEnd = end.getTime() - calendar.getTimeInMillis();
-
-                        PersistableBundle persistableBundle = new PersistableBundle();
-                        persistableBundle.putString(DESCRIPTION_EXTRA,description.getText().toString());
+                    long startTime = start.getTime() - System.currentTimeMillis();
+                    long endTime = end.getTime() - System.currentTimeMillis();
 
 
-                        JobInfo startJobInfo = new JobInfo.Builder(1, serviceName)
-                                .setMinimumLatency(tillToStart)
-                                .setExtras(persistableBundle)
-                                .build();
+                    ScheduleJob.scheduleMe(startTime, "Start your work", "Time to work", description.getText().toString());
+                    ScheduleJob.scheduleMe(endTime, "End your work", "Time to relax", description.getText().toString());
 
-
-                        JobInfo endJobInfo = new JobInfo.Builder(2, serviceName)
-                                .setMinimumLatency(tillToEnd)
-                                .setExtras(persistableBundle)
-                                .build();
-
-                        if (jobScheduler.schedule(startJobInfo) == JobScheduler.RESULT_SUCCESS && jobScheduler.schedule(endJobInfo) == JobScheduler.RESULT_SUCCESS) {
-                            Toast.makeText(getContext(), "Notification Scheduled Successfully", Toast.LENGTH_LONG).show();
-                        }
-
-                        getFragmentManager().popBackStack();
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-
+                    getFragmentManager().popBackStack();
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 }
             }
         });

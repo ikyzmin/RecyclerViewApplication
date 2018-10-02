@@ -3,12 +3,14 @@ package com.jaka.recyclerviewapplication;
 import android.app.Application;
 import android.content.Context;
 
+import com.evernote.android.job.JobManager;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
+import com.jaka.recyclerviewapplication.jobs.ScheduleJobCreator;
 import com.jaka.recyclerviewapplication.model.ContactDatabase;
 import com.jaka.recyclerviewapplication.model.migrations.ContactMigration2;
 import com.jaka.recyclerviewapplication.model.migrations.ContactMigration3;
@@ -33,6 +35,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
+        JobManager.create(this).addJobCreator(new ScheduleJobCreator());
         FirebaseApp.initializeApp(this);
         firebaseFirestore = FirebaseFirestore.getInstance();
         contactDatabase = Room.databaseBuilder(this, ContactDatabase.class, "contact")
