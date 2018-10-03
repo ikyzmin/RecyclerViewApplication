@@ -61,12 +61,11 @@ public class App extends Application implements Application.ActivityLifecycleCal
 
     @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-        activityCount++;
     }
 
     @Override
     public void onActivityStarted(Activity activity) {
-
+        activityCount++;
     }
 
     @Override
@@ -76,7 +75,7 @@ public class App extends Application implements Application.ActivityLifecycleCal
 
     @Override
     public void onActivityPaused(Activity activity) {
-
+        activityCount--;
     }
 
     @Override
@@ -91,7 +90,6 @@ public class App extends Application implements Application.ActivityLifecycleCal
 
     @Override
     public void onActivityDestroyed(Activity activity) {
-        activityCount--;
     }
 
 

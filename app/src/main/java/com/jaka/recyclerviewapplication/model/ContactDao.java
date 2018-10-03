@@ -11,7 +11,7 @@ import androidx.room.Query;
 @Dao
 public interface ContactDao {
 
-    @Query("SELECT * FROM contact")
+    @Query("SELECT * FROM contact ORDER BY last_name ASC")
     List<Contact> getContacts();
 
     @Query("SELECT * FROM contact WHERE id = (:id)")
