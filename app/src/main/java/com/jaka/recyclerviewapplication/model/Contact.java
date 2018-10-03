@@ -6,6 +6,7 @@ import com.jaka.recyclerviewapplication.model.converters.DateTimeConverters;
 
 import java.util.Date;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Index;
@@ -88,6 +89,12 @@ public class Contact {
         return remoteId;
     }
 
+    @NonNull
+    @Override
+    public String toString() {
+        return firstName + "\n" + lastName + "\n" + phoneNumber + "\n" + date;
+    }
+
     public void setRemoteId(String remoteId) {
         this.remoteId = remoteId;
     }
@@ -119,4 +126,5 @@ public class Contact {
         }
 
     }
+
 }

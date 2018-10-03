@@ -3,24 +3,15 @@ package com.jaka.recyclerviewapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.WriteBatch;
 import com.jaka.recyclerviewapplication.async.Loader;
 import com.jaka.recyclerviewapplication.data.repositories.DatabaseRepository;
 import com.jaka.recyclerviewapplication.domain.ContactInteractor;
@@ -29,9 +20,7 @@ import com.jaka.recyclerviewapplication.view.AddContactActivity;
 import com.jaka.recyclerviewapplication.view.ScheduleFragment;
 import com.jaka.recyclerviewapplication.view.adapter.contact.ContactsAdapter;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import androidx.annotation.NonNull;

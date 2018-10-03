@@ -10,12 +10,12 @@ import com.jaka.recyclerviewapplication.R;
 
 import androidx.core.app.NotificationCompat;
 
-public class    ScheduleNotificationManager {
+public class ScheduleNotificationManager {
 
-    public static final String CHANNEL_ID = "Test Channel";
+    private static final String CHANNEL_ID = "Test Channel";
 
 
-    public static Notification createNotification(Context context, String title, String text, String bigText) {
+    private static Notification createNotification(Context context, String title, String text, String bigText) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_announcement_white)
                 .setContentTitle(title)

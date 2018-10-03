@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 public class ScheduleJobCreator implements JobCreator {
 
     static final String SCHEDULE_TAG = "scheduleTag";
+    static final String NOTIFICATION_TAG = "notificationTag";
 
     @Nullable
     @Override
@@ -16,6 +17,8 @@ public class ScheduleJobCreator implements JobCreator {
         switch (tag) {
             case SCHEDULE_TAG:
                 return new ScheduleJob();
+            case NOTIFICATION_TAG:
+                return new NotificationJob();
             default:
                 return null;
         }
