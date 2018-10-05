@@ -1,15 +1,18 @@
 package com.jaka.recyclerviewapplication;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.jaka.recyclerviewapplication.async.Loader;
@@ -18,7 +21,9 @@ import com.jaka.recyclerviewapplication.domain.ContactInteractor;
 import com.jaka.recyclerviewapplication.model.Contact;
 import com.jaka.recyclerviewapplication.view.AddContactActivity;
 import com.jaka.recyclerviewapplication.view.ScheduleFragment;
+import com.jaka.recyclerviewapplication.view.adapter.contact.ContactViewHolder;
 import com.jaka.recyclerviewapplication.view.adapter.contact.ContactsAdapter;
+import com.jaka.recyclerviewapplication.view.swipe.RecycleItemTouchHelperCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,15 +32,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-public class RecyclerViewActivity extends AppCompatActivity {
+public class RecyclerViewActivity extends AppCompatActivity implements RecycleItemTouchHelperCallback.RecycleItemTouchHelperListener {
 
     private final List<Contact> contactList = new ArrayList<>();
     private DatabaseRepository databaseRepository;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private ViewGroup container;
 
     private static final ContactInteractor contactInteractor = new ContactInteractor();
     ContactsAdapter contactsAdapter = new ContactsAdapter(new View.OnClickListener() {
@@ -65,6 +72,7 @@ public class RecyclerViewActivity extends AppCompatActivity {
                 refresh();
             }
         });
+        container = findViewById(R.id.container);
         FloatingActionButton floatingActionButton = findViewById(R.id.add_contact_floating_button);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,6 +95,9 @@ public class RecyclerViewActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addItemDecoration(dividerItemDecoration);
         recyclerView.setAdapter(contactsAdapter);
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecycleItemTouchHelperCallback(this,0, ItemTouchHelper.LEFT);
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
+
     }
 
     @Override
@@ -138,5 +149,34 @@ public class RecyclerViewActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         databaseRepository.quit();
+    }
+
+    @Override
+    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
+        if (viewHolder instanceof ContactViewHolder) {
+            // get the removed item name to display it in snack bar
+            String name = contactsAdapter.getContactFromPosition(viewHolder.getAdapterPosition()).getFirstName();
+
+            // backup of removed item for undo purpose
+            final Contact deletedItem = contactsAdapter.getContactFromPosition(viewHolder.getAdapterPosition());
+            final int deletedIndex = viewHolder.getAdapterPosition();
+
+            // remove the item from recycler view
+            contactsAdapter.removeItem(viewHolder.getAdapterPosition());
+
+            // showing snack bar with Undo option
+            Snackbar snackbar = Snackbar
+                    .make(container, name + " removed from cart!", Snackbar.LENGTH_LONG);
+            snackbar.setAction("UNDO", new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    // undo is selected, restore the deleted item
+                    contactsAdapter.restoreItem(deletedItem, deletedIndex);
+                }
+            });
+            snackbar.setActionTextColor(Color.YELLOW);
+            snackbar.show();
+        }
     }
 }

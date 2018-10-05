@@ -17,4 +17,5 @@
     <string name="last_name">Last name</string>
     <string name="phone_number">Phone number</string>
     <string name="ok">Ok</string>
+    <string name="delete">Delete</string>
 </resources>

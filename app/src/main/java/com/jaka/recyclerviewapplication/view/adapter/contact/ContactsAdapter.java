@@ -19,7 +19,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactViewHolder> {
 
     private View.OnClickListener clickListener;
 
-    public ContactsAdapter(View.OnClickListener clickListener){
+    public ContactsAdapter(View.OnClickListener clickListener) {
         this.clickListener = clickListener;
     }
 
@@ -32,7 +32,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ContactViewHolder holder, int position) {
-        holder.bind(contacts.get(position),clickListener);
+        holder.bind(contacts.get(position), clickListener);
     }
 
     @Override
@@ -44,5 +44,19 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactViewHolder> {
         this.contacts.clear();
         this.contacts.addAll(contacts);
         notifyDataSetChanged();
+    }
+
+    public Contact getContactFromPosition(int position) {
+        return contacts.get(position);
+    }
+
+    public void removeItem(int position) {
+        contacts.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public void restoreItem(Contact item, int position) {
+        contacts.add(position, item);
+        notifyItemInserted(position);
     }
 }
