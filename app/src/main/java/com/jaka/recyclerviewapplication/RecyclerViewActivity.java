@@ -4,11 +4,13 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -39,10 +41,19 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 public class RecyclerViewActivity extends AppCompatActivity implements RecycleItemTouchHelperCallback.RecycleItemTouchHelperListener {
 
-    private final List<Contact> contactList = new ArrayList<>();
     private DatabaseRepository databaseRepository;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ViewGroup container;
+    private Handler undoHandler = new Handler(Looper.getMainLooper());
+    private static long UNDO_DELAY = 5000;
+
+    private Snackbar undoSnackbar;
+    private Runnable undoRunnable = new Runnable() {
+        @Override
+        public void run() {
+            undoSnackbar.dismiss();
+        }
+    };
 
     private static final ContactInteractor contactInteractor = new ContactInteractor();
     ContactsAdapter contactsAdapter = new ContactsAdapter(new View.OnClickListener() {
@@ -63,7 +74,6 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecycleIt
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.a_recycler);
-        mockContacts();
         initRecyclerView();
         swipeRefreshLayout = findViewById(R.id.swipe_refresh_contacts);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -82,20 +92,15 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecycleIt
         });
     }
 
-    private void mockContacts() {
-        // contactInteractor.saveContacts(contactList);
-    }
-
     private void initRecyclerView() {
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
-        //contactsAdapter.setContacts(contactInteractor.getAllContacts());
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 layoutManager.getOrientation());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addItemDecoration(dividerItemDecoration);
         recyclerView.setAdapter(contactsAdapter);
-        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecycleItemTouchHelperCallback(this,0, ItemTouchHelper.LEFT);
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecycleItemTouchHelperCallback(this, 0, ItemTouchHelper.LEFT);
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
 
     }
@@ -154,29 +159,28 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecycleIt
     @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
         if (viewHolder instanceof ContactViewHolder) {
-            // get the removed item name to display it in snack bar
-            String name = contactsAdapter.getContactFromPosition(viewHolder.getAdapterPosition()).getFirstName();
 
-            // backup of removed item for undo purpose
+            String name = contactsAdapter.getContactFromPosition(viewHolder.getAdapterPosition()).getFirstName();
+            undoSnackbar = Snackbar
+                    .make(container, name + " removed from list!", Snackbar.LENGTH_INDEFINITE);
             final Contact deletedItem = contactsAdapter.getContactFromPosition(viewHolder.getAdapterPosition());
             final int deletedIndex = viewHolder.getAdapterPosition();
 
-            // remove the item from recycler view
             contactsAdapter.removeItem(viewHolder.getAdapterPosition());
 
-            // showing snack bar with Undo option
-            Snackbar snackbar = Snackbar
-                    .make(container, name + " removed from cart!", Snackbar.LENGTH_LONG);
-            snackbar.setAction("UNDO", new View.OnClickListener() {
+            undoSnackbar.setAction("UNDO", new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
 
                     // undo is selected, restore the deleted item
                     contactsAdapter.restoreItem(deletedItem, deletedIndex);
+                    undoHandler.removeCallbacks(undoRunnable);
+                    undoSnackbar.dismiss();
                 }
             });
-            snackbar.setActionTextColor(Color.YELLOW);
-            snackbar.show();
+            undoHandler.postDelayed(undoRunnable, UNDO_DELAY);
+            undoSnackbar.setActionTextColor(Color.YELLOW);
+            undoSnackbar.show();
         }
     }
 }
