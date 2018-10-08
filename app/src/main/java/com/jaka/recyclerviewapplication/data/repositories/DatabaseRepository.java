@@ -20,10 +20,13 @@ public class DatabaseRepository {
     }
 
     public void quit() {
-        databaseThread.quit();
+        if (databaseThread != null) {
+            databaseThread.quit();
+        }
     }
 
     public void start(Handler callback) {
+        if (databaseThread == null || !databaseThread.isAlive()) databaseThread = new DatabaseThread();
         databaseThread.start();
         databaseThread.initHandler(callback, contactDatabase.contactDao());
     }
@@ -37,7 +40,11 @@ public class DatabaseRepository {
         databaseThread.insertContact(contact);
     }
 
-    public void insertContacts(Contact ...contact) {
+    public void removeContact(Contact contact) {
+        databaseThread.removeContact(contact);
+    }
+
+    public void insertContacts(Contact... contact) {
         databaseThread.insertContact(contact);
     }
 

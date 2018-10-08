@@ -7,14 +7,21 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.auth.IdpResponse;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.jaka.recyclerviewapplication.async.Loader;
@@ -28,6 +35,7 @@ import com.jaka.recyclerviewapplication.view.adapter.contact.ContactsAdapter;
 import com.jaka.recyclerviewapplication.view.swipe.RecycleItemTouchHelperCallback;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -46,14 +54,14 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecycleIt
     private ViewGroup container;
     private Handler undoHandler = new Handler(Looper.getMainLooper());
     private static long UNDO_DELAY = 5000;
+    private static int SIGN_IN = 100;
+
+    private List<AuthUI.IdpConfig> providers = Arrays.asList(
+            new AuthUI.IdpConfig.EmailBuilder().build());
+
 
     private Snackbar undoSnackbar;
-    private Runnable undoRunnable = new Runnable() {
-        @Override
-        public void run() {
-            undoSnackbar.dismiss();
-        }
-    };
+    private Runnable undoRunnable;
 
     private static final ContactInteractor contactInteractor = new ContactInteractor();
     ContactsAdapter contactsAdapter = new ContactsAdapter(new View.OnClickListener() {
@@ -108,11 +116,40 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecycleIt
     @Override
     protected void onResume() {
         super.onResume();
-        refresh();
+
+        if (App.getInstance().getFirebaseAuth().getCurrentUser() != null) {
+            databaseRepository = new DatabaseRepository(App.getInstance().getDatabase());
+            refresh();
+        } else {
+            startActivityForResult(
+                    AuthUI.getInstance()
+                            .createSignInIntentBuilder()
+                            .setAvailableProviders(providers)
+                            .build(),
+                    SIGN_IN);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == SIGN_IN) {
+            IdpResponse response = IdpResponse.fromResultIntent(data);
+            if (resultCode == RESULT_OK) {
+                FirebaseUser user = App.getInstance().getFirebaseAuth().getCurrentUser();
+                databaseRepository = new DatabaseRepository(App.getInstance().getDatabase());
+                refresh();
+            } else {
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        databaseRepository.quit();
     }
 
     private void refresh() {
-        databaseRepository = new DatabaseRepository(App.getInstance().getDatabase());
         App.getInstance().getFirebaseCollection().get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -157,10 +194,38 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecycleIt
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.a_recycler, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.sign_out:
+                AuthUI.getInstance()
+                        .signOut(this)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            public void onComplete(@NonNull Task<Void> task) {
+                                startActivityForResult(
+                                        AuthUI.getInstance()
+                                                .createSignInIntentBuilder()
+                                                .setAvailableProviders(providers)
+                                                .build(),
+                                        SIGN_IN);
+                            }
+                        });
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
         if (viewHolder instanceof ContactViewHolder) {
 
-            String name = contactsAdapter.getContactFromPosition(viewHolder.getAdapterPosition()).getFirstName();
+            Contact contact = contactsAdapter.getContactFromPosition(viewHolder.getAdapterPosition());
+            String name = contact.getFirstName();
             undoSnackbar = Snackbar
                     .make(container, name + " removed from list!", Snackbar.LENGTH_INDEFINITE);
             final Contact deletedItem = contactsAdapter.getContactFromPosition(viewHolder.getAdapterPosition());
@@ -171,16 +236,47 @@ public class RecyclerViewActivity extends AppCompatActivity implements RecycleIt
             undoSnackbar.setAction("UNDO", new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
-                    // undo is selected, restore the deleted item
                     contactsAdapter.restoreItem(deletedItem, deletedIndex);
                     undoHandler.removeCallbacks(undoRunnable);
                     undoSnackbar.dismiss();
                 }
             });
+            initUndoRunnable(contact);
             undoHandler.postDelayed(undoRunnable, UNDO_DELAY);
             undoSnackbar.setActionTextColor(Color.YELLOW);
             undoSnackbar.show();
         }
+    }
+
+    private void initUndoRunnable(final Contact contact) {
+        undoRunnable = new Runnable() {
+            @Override
+            public void run() {
+                undoSnackbar.dismiss();
+                App.getInstance().getFirebaseCollection()
+                        .document(contact.getRemoteId())
+                        .delete()
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                databaseRepository.start(new Handler(getMainLooper()) {
+                                    @Override
+                                    public void handleMessage(Message msg) {
+                                        switch (msg.what) {
+                                            case Loader.LOADING_COMPLETE:
+                                                if (msg.obj != null) {
+                                                    if (msg.obj instanceof List) {
+                                                        Snackbar.make(container, "Removed", Snackbar.LENGTH_SHORT).show();
+                                                    }
+                                                }
+                                                break;
+                                        }
+                                    }
+                                });
+                                databaseRepository.removeContact(contact);
+                            }
+                        });
+            }
+        };
     }
 }

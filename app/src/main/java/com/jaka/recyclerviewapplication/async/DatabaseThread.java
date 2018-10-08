@@ -47,4 +47,8 @@ public class DatabaseThread extends HandlerThread {
         loader.obtainMessage(Loader.INSERT_CONTACTS, contact).sendToTarget();
     }
 
+    public void removeContact(Contact contact) {
+        loader.obtainMessage(Loader.DELETE_CONTACT, contact).sendToTarget();
+    }
+
 }

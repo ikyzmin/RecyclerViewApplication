@@ -46,7 +46,9 @@ public class FirebaseNotificationService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        listenerRegistration.remove();
+        if (listenerRegistration != null) {
+            listenerRegistration.remove();
+        }
     }
 
     @Nullable

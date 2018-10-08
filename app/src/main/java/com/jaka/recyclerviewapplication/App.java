@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import com.evernote.android.job.JobManager;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jaka.recyclerviewapplication.jobs.NotificationJob;
@@ -53,6 +54,10 @@ public class App extends Application implements Application.ActivityLifecycleCal
 
     public CollectionReference getFirebaseCollection() {
         return firebaseFirestore.collection("contacts");
+    }
+
+    public FirebaseAuth getFirebaseAuth(){
+        return FirebaseAuth.getInstance();
     }
 
     public boolean isAppIsInBackground() {
